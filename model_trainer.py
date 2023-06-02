@@ -23,7 +23,7 @@ from sklearn.metrics import confusion_matrix,classification_report,accuracy_scor
 import datetime
 
 
-
+#load and preprocessing training data, return train and test data
 def data_loader(IMAGE_SHAPE = (224, 224), BATCH_SIZE = 32):
     train_dir = "C:/Users/peter/Desktop/Code/Projects/Image_Aesthetic_Analysis_Project/datasets/car_dataset/Train"
     test_dir = "C:/Users/peter/Desktop/Code/Projects/Image_Aesthetic_Analysis_Project/datasets/car_dataset/Test/"
@@ -61,7 +61,7 @@ def data_loader(IMAGE_SHAPE = (224, 224), BATCH_SIZE = 32):
     #y_test=np.argmax(y_test, axis=1)
     return train_data, test_data
 
-
+#callback function for writing logs
 def create_tensorboard_callback(dir_name, experiment_name):
   log_dir = dir_name + "/" + experiment_name + "/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
   tensorboard_callback = tf.keras.callbacks.TensorBoard(
@@ -70,6 +70,7 @@ def create_tensorboard_callback(dir_name, experiment_name):
   print(f"Saving TensorBoard log files to: {log_dir}")
   return tensorboard_callback
 
+#Build model and return new model
 def model_builder():
     from hyperopt import hp
     image_size = 224
@@ -105,6 +106,7 @@ def model_builder():
     
     return new_model
 
+#train the model and return history
 def train_model(new_model, train_data, test_data, epochs):
     history = new_model.fit(train_data,
               epochs=epochs,
@@ -115,6 +117,7 @@ def train_model(new_model, train_data, test_data, epochs):
               callbacks=[create_tensorboard_callback(dir_name="logs", experiment_name="test")])
     return history
 
+#print accuracy and validation results
 def show_accuracy_vs_val(history, epochs):
 
     acc = history.history['accuracy']
@@ -142,11 +145,12 @@ def show_accuracy_vs_val(history, epochs):
 
     return
 
+#apply model to predict data
 def predict(new_model, test_data):
     y_pred = new_model.predict(test_data)
     return y_pred,
 
-
+#print confusion matrix and claassification report
 def show_details(y_test,y_pred,target_names = ['Bad', 'Good']):
     print(accuracy_score(y_test, y_pred))
     print(confusion_matrix(y_test,y_pred))
